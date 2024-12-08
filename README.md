@@ -12,7 +12,7 @@ An interactive web app with:
 1. Clone the repo.  
 2. Open `index.html` in a browser or use a local server.  
 
-### Try Now🌍
-[Visit Here](https://aryannlol.github.io/interactive-world-map/)  
+### Try Now(For Desktop Browsers only)🌍
+(https://aryannlol.github.io/interactive-world-map/)  
 
 Enjoy exploring! 🌍
