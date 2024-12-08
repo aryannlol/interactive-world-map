@@ -1,25 +1,41 @@
-### World Map Explorer🌍  
-An interactive web app with:  
-- A clickable world map.  
-- Country details (population, area, etc.).  
-- Top countries by GDP.  
-- Landmark fetching via API *(in progress)*.  
+# 🌍 Interactive World Map  
 
-### Mobile Support🌍
-- Currently under development for optimal functionality.  
+An interactive web app that brings the world to your fingertips with:  
+- A clickable **world map**.  
+- Country details *(population, area, etc.)*.  
+- Insights into **top countries by GDP**.  
+- Fetch landmarks via API *(in progress)*.  
 
-### How to Run🌍  
-1. Clone the repo.  
-2. Open `index.html` in a browser or use a local server.
+---
 
+## 🚀 Features Coming Soon  
 
+- **Mobile Optimization**: Seamless experience on all devices *(currently under development)*.  
+- **Landmark Exploration**: Discover iconic landmarks from any country *(coming soon)*.  
 
+---
 
+## 📝 About This Project  
 
-![image](https://github.com/user-attachments/assets/82a11ba6-0f19-49c8-87a5-dbc1b82e0981)
+World Map Explorer allows users to interactively explore countries, view demographic insights, and visualize global statistics with ease.  
 
+---
 
-### Try Now(For Desktop Browsers only)🌍
-[Click Here!](https://aryannlol.github.io/interactive-world-map/)  
+## 📱 Mobile Support 🌏  
 
-Enjoy exploring! 🌍
+Mobile-friendly navigation and features are in progress. Stay tuned!  
+
+---
+
+## How to Run  
+
+1. Clone the repository.  
+2. Open `index.html` in your browser or use a local server.  
+
+---
+
+## 🖥️ Explore Now *(Desktop Browsers Only)*  
+
+[**Click Here to Explore!**](https://aryannlol.github.io/interactive-world-map/)  
+
+Enjoy exploring the world's wonders! 🌍✨
