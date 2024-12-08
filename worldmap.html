@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <title>Global Explorer - Enhanced Interactive World Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #1a5f7a;
+            --color-secondary: #159895;
+            --color-accent: #57c5b6;
+            --color-background: #f0f4f8;
+            --color-text: #2c3e50;
+            --shadow-subtle: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-elevated: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--color-background) 0%, #e9ecef 100%);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .app-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+    background: url('/countries/resources/bluesky.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+        .sidebar {
+            width: 350px;
+            background-color: white;
+            box-shadow: var(--shadow-elevated);
+            padding: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .top-countries-list {
+            list-style-type: none;
+        }
+
+        .top-countries-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .top-countries-list li:last-child {
+            border-bottom: none;
+        }
+
+        .map-container {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #map-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .map-control-btn {
+            background-color: var(--color-secondary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .map-control-btn:hover {
+            background-color: var(--color-accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevated);
+        }
+
+       
+
+        .map-title {
+            text-align: center;
+            color: var(--color-primary);
+            padding: 10px;
+            font-size: 1.8rem;
+        }
+
+        svg path {
+            fill: #a0a0a0;
+            stroke: white;
+            stroke-width: 0.5px;
+            transition: fill 0.2s ease;
+        }
+
+        svg path:hover {
+            fill: var(--color-secondary);
+            cursor: pointer;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .category-btn.active {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+
+        #landmark-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .weather-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @media screen and (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 50%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 10;
+        overflow-y: auto;
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .map-container {
+        height: 50%;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    #map-controls {
+        bottom: 10px;
+        right: 10px;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .map-control-btn {
+        padding: 8px;
+        font-size: 0.8rem;
+        width: 80px;
+        text-align: center;
+    }
+
+    .sidebar-section {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .sidebar-title {
+        font-size: 1rem;
+    }
+
+    .category-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .category-btn, .landmark-btn {
+        flex-grow: 1;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    #landmark-list, #top-countries-list {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    /* Optional: Add a drag handle for the sidebar */
+    .sidebar::before {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 5px;
+        background-color: #ccc;
+        border-radius: 3px;
+    }
+}
+
+/* Additional mobile touch interactions */
+@media (pointer: coarse) {
+    svg path {
+        stroke-width: 1px; /* Wider touch target */
+    }
+
+    .map-control-btn {
+        min-height: 44px; /* Minimum touch target size recommendation */
+        min-width: 44px;
+    }
+}
+
+
+
+    </style>
+</head>
+<body>
+    <p style="background-image: url('/countries/resources/clouds-7050884_1280.jpg');"></p>
+    <div class="app-container">
+        <div class="sidebar">
+            <h2 class="map-title">Interactive World Map</h2>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Country Details</h3>
+                <div id="country-details">
+                    <!-- Country details will be shown here -->
+                    <p>Click on a country to see details</p>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Landmarks</h3>
+                <div class="category-selector">
+                    <button class="landmark-btn active" data-type="natural">Natural</button>
+                    <button class="landmark-btn" data-type="historical">Historical</button>
+                    <button class="landmark-btn" data-type="modern">Modern</button>
+                </div>
+                <ul id="landmark-list">
+                    <!-- Landmarks will be dynamically populated here -->
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Top Countries Selector</h3>
+                <div class="category-selector">
+                    <button class="category-btn active" data-category="population">Top Population</button>
+                    <button class="category-btn" data-category="gdp">Top GDP</button>
+                    <button class="category-btn" data-category="area">Top Area</button>
+                </div>
+                <ul id="top-countries-list" class="top-countries-list">
+                    <!-- Top countries will be dynamically populated here -->
+                </ul>
+            </div>
+
+            
+
+            
+        </div>
+        
+        <div class="map-container" id="map-container">
+            <div id="svg-wrapper"></div>
+            
+            <div id="map-controls">
+                <button class="map-control-btn" id="zoom-in">Zoom In</button>
+                <button class="map-control-btn" id="zoom-out">Zoom Out</button>
+                <button class="map-control-btn" id="reset-view">Reset View</button>
+            </div>
+            
+            <div id="tooltip" class="tooltip"></div>
+        </div>
+    </div>
+
+    <script>
+        class EnhancedGlobalExplorer {
+            constructor() {
+                this.mapContainer = document.getElementById('map-container');
+                this.svgWrapper = document.getElementById('svg-wrapper');
+                
+                this.topCountriesList = document.getElementById('top-countries-list');
+                this.landmarkList = document.getElementById('landmark-list');
+                this.countryDetails = document.getElementById('country-details');
+                this.gdpData={};
+                this.scale = 1;
+                this.translate = { x: 0, y: 0 };
+                this.isPanning = false;
+                this.startPoint = {};
+        
+                this.apiKey = '6e2a59c1eef74b4b91a143804241011'; // Replace with your new API key
+ 
+                this.init();
+            }
+    
+            async init() {
+    try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const data = await response.json();
+
+        this.countryData = data.reduce((acc, country) => {
+            acc[country.cca2] = {
+                id: country.cca2,
+                name: country.name.common,
+                population: country.population,
+                area: country.area,
+                capital: country.capital ? country.capital[0] : "N/A",
+                region: country.region,
+                climate: "Varied",
+                language: Object.values(country.languages || {}).join(", ") || "Unknown",
+            };
+            return acc;
+        }, {});
+
+        const svgResponse = await fetch('/countries/resources/world-map.svg');
+        const svgContent = await svgResponse.text();
+        this.svgWrapper.innerHTML = svgContent;
+
+        this.setupEventListeners();
+        this.initializeCountryInteractions();
+        await this.renderTopCountries(); // Fetch and render top countries with GDP data
+    } catch (error) {
+        console.error('Error during initialization:', error);
+    }
+}
+
+
+            
+    
+            
+    
+setupEventListeners() {
+    const naturalBtn = document.getElementById('btn-natural');
+    const historicBtn = document.getElementById('btn-historic');
+    const modernBtn = document.getElementById('btn-modern');
+
+    if (naturalBtn) {
+        naturalBtn.addEventListener('click', () => this.populateLandmarks('natural'));
+    }
+
+    if (historicBtn) {
+        historicBtn.addEventListener('click', () => this.populateLandmarks('historic'));
+    }
+
+    if (modernBtn) {
+        modernBtn.addEventListener('click', () => this.populateLandmarks('modern'));
+    }
+    // Category selector for top countries
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const category = btn.dataset.category;
+
+            if (category === 'gdp') {
+                // Dynamically fetch GDP data and refresh
+                await this.renderTopCountries(category);
+            } else {
+                // Populate static data for other categories
+                this.populateTopCountries(category);
+            }
+        });
+    });
+
+    // Landmark type selector
+    document.querySelectorAll('.landmark-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.landmark-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.populateLandmarks(btn.dataset.type);
+        });
+    });
+
+    // Zoom and pan interactions
+    this.mapContainer.addEventListener('wheel', this.handleZoom.bind(this));
+    this.mapContainer.addEventListener('mousedown', this.startPan.bind(this));
+    this.mapContainer.addEventListener('mousemove', this.doPan.bind(this));
+    this.mapContainer.addEventListener('mouseup', this.endPan.bind(this));
+
+    // Zoom control buttons
+    document.getElementById('zoom-in').addEventListener('click', () => this.zoom(0.2));
+    document.getElementById('zoom-out').addEventListener('click', () => this.zoom(-0.2));
+    document.getElementById('reset-view').addEventListener('click', this.resetView.bind(this));
+}
+
+
+    
+async showCountryDetails(countryName) {
+    const country = this.countryData[countryName];
+    if (!country) {
+        console.error("Country data not found:", countryName);
+        return;
+    }
+
+    let weatherDisplay = 'N/A';
+    let gdpData = {
+        gdpNominal: 'N/A',
+        gdpGrowth: 'N/A',
+        gdpPerCapitaNominal: 'N/A',
+        gdpPpp: 'N/A',
+        year: 'Unknown'
+    };
+
+    try {
+        const weather = await this.getWeatherData(country.name);
+        weatherDisplay = `${weather.temperature}°C, ${weather.condition}`;
+    } catch (err) {
+        console.error("Error fetching weather data:", err);
+    }
+
+    try {
+        gdpData = await this.getGdpData(country.name);
+    } catch (err) {
+        console.error("Error fetching GDP data:", err);
+    }
+
+    this.countryDetails.innerHTML = `
+        <h4>${country.name}</h4>
+        <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+        <p><strong>Capital:</strong> ${country.capital || 'N/A'}</p>
+        <p><strong>Region:</strong> ${country.region || 'N/A'}</p>
+        <p><strong>Language:</strong> ${country.language || 'N/A'}</p>
+        <p><strong>Weather:</strong> ${weatherDisplay}</p>
+        <p><strong>Climate:</strong> ${country.climate || 'N/A'}</p>
+        <p><strong>GDP Nominal (in ${gdpData.year}):</strong> ${gdpData.gdpNominal}</p>
+        <p><strong>GDP Growth:</strong> ${gdpData.gdpGrowth}</p>
+        <p><strong>GDP Per Capita (Nominal):</strong> ${gdpData.gdpPerCapitaNominal}</p>
+        <p><strong>GDP PPP:</strong> ${gdpData.gdpPpp}</p>
+    `;
+}
+
+
+initializeCountryInteractions() {
+    const countries = document.querySelectorAll('svg path');
+    countries.forEach(country => {
+        country.addEventListener('click', async () => {
+            const countryName = country.id;
+            console.log("Clicked on country:", countryName);
+            await this.showCountryDetails(countryName);
+        });
+    });
+}
+
+
+
+
+async getWeatherData(countryName) {
+    const apiKey = '6e2a59c1eef74b4b91a143804241011'; // Use your actual API key
+    const urlString = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${countryName}`;
+
+    try {
+        console.log("Fetching weather for:", countryName); // Debug
+        const response = await fetch(urlString);
+        if (!response.ok) {
+            console.error("API Error:", response.statusText); // Debug
+            throw new Error(`Error: ${response.status}`);
+        }
+        const weatherData = await response.json();
+        console.log("Weather Data:", weatherData); // Debug
+        return {
+            temperature: weatherData.current.temp_c.toFixed(1),
+            condition: weatherData.current.condition.text
+        };
+    } catch (err) {
+        console.error('Error fetching weather data:', err); // Debug
+        return { temperature: 'N/A', condition: 'Unknown' };
+    }
+}
+async getGdpData(countryName) {
+    const apiKey = 'MJWootSkrxgYQudG8XJpog==u8ZkFKZSyW80irIs';
+    const urlString = `https://api.api-ninjas.com/v1/gdp?country=${encodeURIComponent(countryName)}`;
+
+    try {
+        const response = await fetch(urlString, {
+            method: 'GET',
+            headers: { 'X-Api-Key': apiKey },
+        });
+
+        const gdpData = await response.json();
+
+        console.log(`GDP data for ${countryName}:`, gdpData);
+
+        if (!response.ok || !gdpData || gdpData.length === 0) {
+            return {
+                gdpNominal: 'N/A',
+                gdpGrowth: 'N/A',
+                gdpPerCapitaNominal: 'N/A',
+                gdpPpp: 'N/A',
+                year: 'Unknown',
+            };
+        }
+
+        // Filter data for the year range 2024–2029
+        const latestData = gdpData.find(data => data.year >= 2024 && data.year <= 2029);
+
+        if (!latestData) {
+            console.warn(`No GDP data available for ${countryName} in the year range 2024–2029.`);
+            return {
+                gdpNominal: 'N/A',
+                gdpGrowth: 'N/A',
+                gdpPerCapitaNominal: 'N/A',
+                gdpPpp: 'N/A',
+                year: 'Unknown',
+            };
+        }
+
+        return {
+            gdpNominal: latestData.gdp_nominal
+                ? `$${latestData.gdp_nominal.toFixed(2)} Billion`
+                : 'N/A',
+            gdpGrowth: latestData.gdp_growth || 'N/A',
+            gdpPerCapitaNominal: latestData.gdp_per_capita_nominal
+                ? `$${latestData.gdp_per_capita_nominal.toFixed(2)}`
+                : 'N/A',
+            gdpPpp: latestData.gdp_ppp
+                ? `$${latestData.gdp_ppp.toFixed(2)}`
+                : 'N/A',
+            year: latestData.year || 'Unknown',
+        };
+    } catch (error) {
+        console.error("Error fetching GDP data:", error);
+        return {
+            gdpNominal: 'N/A',
+            gdpGrowth: 'N/A',
+            gdpPerCapitaNominal: 'N/A',
+            gdpPpp: 'N/A',
+            year: 'Unknown',
+        };
+    }
+}
+async renderTopCountries(category) {
+    console.log('Fetching GDP data for top countries...');
+    
+    const promises = Object.values(this.countryData).map(async (country) => {
+        const gdpData = await this.getGdpData(country.name);
+        this.gdpData[country.name] = gdpData; // Store fetched GDP data
+        return {
+            ...country,
+            gdp: parseFloat(gdpData.gdpNominal.replace('Billion', '').replace('$', '')) || 0, // Convert GDP to number
+        };
+    });
+
+    const countriesWithGdp = await Promise.all(promises);
+
+    this.populateTopCountries(category, countriesWithGdp);
+}
+async populateTopCountries(category) {
+    console.log('Running populateTopCountries with category:', category);
+
+    const sortedCountries = await Promise.all(
+        Object.values(this.countryData).map(async (country) => {
+            let gdp = 0;
+
+            if (category === 'gdp') {
+                // Fetch GDP dynamically for each country if needed
+                const gdpData = await this.getGdpData(country.name);
+                gdp = parseFloat(gdpData.gdpNominal.replace(/[$,Billion]/g, '')) || 0; // Extract GDP value
+            }
+
+            return {
+                ...country,
+                gdp,
+            };
+        })
+    );
+
+    const sortedByCategory = sortedCountries.sort((a, b) => {
+        if (category === 'population') return b.population - a.population;
+        if (category === 'gdp') return b.gdp - a.gdp;
+        return b.area - a.area;
+    });
+
+    const topCountries = sortedByCategory.slice(0, 5);
+
+    console.log('Top Countries to render:', topCountries);
+
+    // Dynamically populate the UI
+    this.topCountriesList.innerHTML = topCountries
+        .map((country, index) => `
+            <li>
+                <span>${index + 1}. ${country?.name || 'Unknown'}</span>
+                <span>
+                    ${
+                        category === 'population'
+                            ? country?.population?.toLocaleString() || 'N/A'
+                            : category === 'gdp'
+                            ? `$${country.gdp.toFixed(2)} Billion`
+                            : `${country?.area?.toLocaleString()} km²`
+                    }
+                </span>
+            </li>
+        `)
+        .join('');
+}
+
+async fetchLandmarks(city) {
+    const url = "https://api.map-places.com/place?type=landmark&location=" + city;
+    
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "X-RapidAPI-Host": "map-places.p.rapidapi.com",
+                "X-RapidAPI-Key": "0226555673msh4d240210531e692p11ce36jsn89e56685839f"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch landmarks');
+        }
+
+        const data = await response.json();
+
+        this.populateLandmarks(data);
+    } catch (error) {
+        console.error("Error fetching landmarks:", error);
+    }
+}
+
+
+
+populateLandmarks(data) {
+    this.landmarkList.innerHTML = ""; // Clear previous results
+
+    if (data && data.length > 0) {
+        data.forEach(landmark => {
+            const listItem = document.createElement('div');
+            listItem.textContent = `${landmark.name}`;
+            listItem.className = 'landmark-item';
+            this.landmarkList.appendChild(listItem);
+        });
+    } else {
+        this.landmarkList.innerHTML = "<p>No landmarks found</p>";
+    }
+}
+
+
+    
+            zoom(amount) {
+                this.scale += amount;
+                this.scale = Math.max(this.scale, 0.5);  // Minimum zoom scale
+                this.updateMapTransform();
+            }
+    
+            handleZoom(evt) {
+                evt.preventDefault();
+                const zoomAmount = evt.deltaY < 0 ? 0.2 : -0.2;
+                this.zoom(zoomAmount);
+            }
+    
+            startPan(evt) {
+                this.isPanning = true;
+                this.startPoint = { x: evt.pageX, y: evt.pageY };
+            }
+    
+            doPan(evt) {
+                if (!this.isPanning) return;
+                const dx = evt.pageX - this.startPoint.x;
+                const dy = evt.pageY - this.startPoint.y;
+                this.translate.x += dx;
+                this.translate.y += dy;
+                this.startPoint = { x: evt.pageX, y: evt.pageY };
+                this.updateMapTransform();
+            }
+    
+            endPan() {
+                this.isPanning = false;
+            }
+    
+            resetView() {
+                this.scale = 1;
+                this.translate = { x: 0, y: 0 };
+                this.updateMapTransform();
+            }
+    
+            updateMapTransform() {
+                this.svgWrapper.style.transform = `scale(${this.scale}) translate(${this.translate.x}px, ${this.translate.y}px)`;
+            }
+        }
+        
+
+
+
+
+
+    
+        // Initialize the explorer on page load
+        document.addEventListener('DOMContentLoaded', () => new EnhancedGlobalExplorer());
+    </script>
+    
