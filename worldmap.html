@@ -260,7 +260,7 @@
     </style>
 </head>
 <body>
-    <p style="background-image: url('/countries/resources/clouds-7050884_1280.jpg');"></p>
+    <p style="background-image: url('clouds-7050884_1280.jpg');"></p>
     <div class="app-container">
         <div class="sidebar">
             <h2 class="map-title">Interactive World Map</h2>
@@ -271,7 +271,7 @@
                     <p>Click on a country to see details</p>
                 </div>
             </div>
-            <div class="sidebar-section">
+            <div class="sidebar-section">   
                 <h3 class="sidebar-title">Landmarks</h3>
                 <div class="category-selector">
                     <button class="landmark-btn active" data-type="natural">Natural</button>
@@ -352,7 +352,7 @@
             return acc;
         }, {});
 
-        const svgResponse = await fetch('/countries/resources/world-map.svg');
+        const svgResponse = await fetch('world-map.svg');
         const svgContent = await svgResponse.text();
         this.svgWrapper.innerHTML = svgContent;
 
