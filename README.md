@@ -9,6 +9,6 @@ An interactive web app with:
 2. Open `index.html` in a browser or use a local server.  
 
 ### Live Demo🌍 
-[Try Now]()  
+[Try Now](https://aryannlol.github.io/interactive-world-map/)  
 
 Enjoy exploring! 🌍
