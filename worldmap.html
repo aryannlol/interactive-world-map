@@ -271,17 +271,7 @@
                     <p>Click on a country to see details</p>
                 </div>
             </div>
-            <div class="sidebar-section">   
-                <h3 class="sidebar-title">Landmarks</h3>
-                <div class="category-selector">
-                    <button class="landmark-btn active" data-type="natural">Natural</button>
-                    <button class="landmark-btn" data-type="historical">Historical</button>
-                    <button class="landmark-btn" data-type="modern">Modern</button>
-                </div>
-                <ul id="landmark-list">
-                    <!-- Landmarks will be dynamically populated here -->
-                </ul>
-            </div>
+
             
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Top Countries Selector</h3>
@@ -508,7 +498,7 @@ async getWeatherData(countryName) {
     }
 }
 async getGdpData(countryName) {
-    const apiKey = 'MJWootSkrxgYQudG8XJpog==u8ZkFKZSyW80irIs';
+    const apiKey = 'L7qjJBm8kt3Bha24yMTqNQ==anE999VDbq7GFVGX';
     const urlString = `https://api.api-ninjas.com/v1/gdp?country=${encodeURIComponent(countryName)}`;
 
     try {
