@@ -13,6 +13,6 @@ An interactive web app with:
 2. Open `index.html` in a browser or use a local server.  
 
 ### Try Now🌍
-[Visit Here](https://<your-username>.github.io/world-map-explorer)  
+[Visit Here](https://aryannlol.github.io/interactive-world-map/)  
 
 Enjoy exploring! 🌍
