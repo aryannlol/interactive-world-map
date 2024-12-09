@@ -35,7 +35,7 @@
     display: flex;
     height: 100vh;
     position: relative;
-    background: url('/countries/resources/bluesky.gif');
+    background: url('bluesky.gif');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -311,7 +311,7 @@
     </style>
 </head>
 <body>
-    <p style="background-image: url('/countries/resources/clouds-7050884_1280.jpg');"></p>
+    <p style="background-image: url('clouds-7050884_1280.jpg');"></p>
     
     <div class="app-container">
         <div class="sidebar">
@@ -423,7 +423,7 @@
             return acc;
         }, {});
 
-        const svgResponse = await fetch('/countries/resources/world-map.svg');
+        const svgResponse = await fetch('world-map.svg');
         const svgContent = await svgResponse.text();
         this.svgWrapper.innerHTML = svgContent;
 
