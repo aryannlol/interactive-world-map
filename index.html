@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Explorer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Previous CSS styles remain the same -->
     <style>
+        /* Previous styles remain unchanged */
         :root {
-            --color-primary: #2c3e50;       /* Deep blue-gray */
-            --color-secondary: #3498db;     /* Vibrant blue */
-            --color-accent: #e74c3c;        /* Bright red */
-            --color-background: #f7f9fc;    /* Soft light blue */
-            --color-text: #2c3e50;          /* Dark text color */
-            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            --color-primary: #6366f1;    
+            --color-secondary: #818cf8;  
+            --color-dark: #1e1b4b;      
+            --color-light: #eef2ff;     
+            --color-accent: #f472b6;    
+            --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
         }
 
         * {
@@ -22,127 +25,392 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--color-background) 0%, #e9f0f7 100%);
-            color: var(--color-text);
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--color-dark);
+            color: var(--color-light);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            align-items: center;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            gap: 4rem;
         }
 
         .content-section {
-            z-index: 10;
+            flex: 1;
             opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 1s forwards;
+            animation: slideIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        @keyframes fadeInUp {
+        .visual-section {
+            flex: 1;
+            position: relative;
+            opacity: 0;
+            animation: slideIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
         }
 
         .main-title {
-            font-size: 3.5rem;
+            font-size: 4.5rem;
             font-weight: 700;
-            color: var(--color-primary);
-            margin-bottom: 1rem;
-            line-height: 1.2;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
         }
 
         .description {
-            font-size: 1.2rem;
-            color: var(--color-text);
-            margin-bottom: 2rem;
+            font-size: 1.25rem;
+            color: #a5b4fc;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
         }
 
-        .explore-btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background-color: var(--color-secondary);
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--gradient-primary);
             color: white;
             text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: var(--transition-smooth);
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.2);
+            border-radius: 100px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
         }
 
-        .explore-btn:hover {
-            background-color: var(--color-accent);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 25px rgba(231, 76, 60, 0.3);
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-light);
+            text-decoration: none;
+            border-radius: 100px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .map-section {
+        .primary-btn:hover, .secondary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        #globe-container {
+            width: 600px;
+            height: 600px;
             position: relative;
-            perspective: 1000px;
+            cursor: move;
         }
 
-        .world-map {
-            width: 100%;
-            transition: var(--transition-smooth);
-            transform-style: preserve-3d;
-            transform: rotateY(-10deg);
-        }
-
-        .world-map:hover {
-            transform: rotateY(0deg) scale(1.02);
-        }
-
-        @media screen and (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                padding: 1rem;
-            }
-
-            .main-title {
-                font-size: 2.5rem;
-            }
-
-            .description {
-                font-size: 1rem;
-            }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            box-shadow: 0 0 100px rgba(99, 102, 241, 0.2);
         }
 
         .footer {
             text-align: center;
-            padding: 1rem;
-            background-color: var(--color-primary);
-            color: white;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--color-light);
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        @media screen and (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .main-title {
+                font-size: 3rem;
+            }
+
+            .description {
+                font-size: 1.1rem;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .button-group {
+                justify-content: center;
+            }
+
+            #globe-container {
+                width: 400px;
+                height: 400px;
+            }
+        }
+
+        @media screen and (max-width: 640px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            #globe-container {
+                width: 300px;
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="content-section">
-            <h1 class="main-title">Explore Our World</h1>
+            <h1 class="main-title">Discover Our Beautiful Planet</h1>
             <p class="description">
-                Embark on a digital journey across continents. Discover cultures, landscapes, and stories with just a click.
+                Explore our interactive 3D globe. Drag to rotate and discover the beauty of Earth from every angle. Your next adventure begins here.
             </p>
-            <a href="worldmap.html" class="explore-btn">Start Exploring</a>
+            <div class="button-group">
+                <a href="#explore" class="primary-btn">Start Exploring</a>
+                <a href="#learn" class="secondary-btn">Learn More</a>
+            </div>
         </div>
-        <div class="map-section">
-            <svg class="world-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-                <!-- Placeholder for world map SVG paths -->
-                <path fill="var(--color-secondary)" opacity="0.5" d="M500 250 L600 300 L400 350 Z"></path>
-            </svg>
+        <div class="visual-section">
+            <div id="globe-container"></div>
         </div>
     </div>
     <footer class="footer">
-        © 2024 Global Explorer | Created with ❤️ by Aryan
+        © 2024 Global Explorer | Designed with ❤️ by Aryan
     </footer>
+
+    <script>
+        // Initialize Three.js scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const container = document.getElementById('globe-container');
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // Create Earth-like texture
+        const canvas = document.createElement('canvas');
+        canvas.width = 2048;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Background (oceans)
+        ctx.fillStyle = '#1e3d59';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Add some ocean variation
+        for (let i = 0; i < 50000; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const radius = Math.random() * 2;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(42, 82, 122, ${Math.random() * 0.5})`;
+            ctx.fill();
+        }
+
+        // Add continents (simplified shapes for major landmasses)
+        ctx.fillStyle = '#2e7d32';  // Green for land
+        
+        // North America
+        ctx.beginPath();
+        ctx.moveTo(350, 200);
+        ctx.bezierCurveTo(400, 150, 500, 180, 520, 280);
+        ctx.bezierCurveTo(480, 350, 400, 380, 350, 320);
+        ctx.fill();
+
+        // South America
+        ctx.beginPath();
+        ctx.moveTo(500, 400);
+        ctx.bezierCurveTo(550, 450, 520, 600, 450, 650);
+        ctx.bezierCurveTo(400, 600, 420, 500, 450, 450);
+        ctx.fill();
+
+        // Europe
+        ctx.beginPath();
+        ctx.moveTo(900, 200);
+        ctx.bezierCurveTo(1000, 180, 1050, 250, 1000, 300);
+        ctx.bezierCurveTo(950, 280, 920, 250, 900, 200);
+        ctx.fill();
+
+        // Africa
+        ctx.beginPath();
+        ctx.moveTo(900, 300);
+        ctx.bezierCurveTo(1000, 350, 1000, 500, 900, 550);
+        ctx.bezierCurveTo(850, 500, 850, 350, 900, 300);
+        ctx.fill();
+
+        // Asia
+        ctx.beginPath();
+        ctx.moveTo(1100, 200);
+        ctx.bezierCurveTo(1300, 150, 1400, 250, 1350, 350);
+        ctx.bezierCurveTo(1250, 400, 1150, 350, 1100, 200);
+        ctx.fill();
+
+        // Australia
+        ctx.beginPath();
+        ctx.moveTo(1400, 500);
+        ctx.bezierCurveTo(1500, 480, 1550, 550, 1500, 600);
+        ctx.bezierCurveTo(1450, 620, 1400, 550, 1400, 500);
+        ctx.fill();
+
+        // Add some terrain variation
+        for (let i = 0; i < 50000; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const radius = Math.random() * 1.5;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.1})`;
+            ctx.fill();
+        }
+
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+        
+        // Create globe geometry
+        const geometry = new THREE.SphereGeometry(2, 64, 64);
+        const material = new THREE.MeshPhongMaterial({
+            map: texture,
+            bumpMap: texture,
+            bumpScale: 0.05,
+            specular: new THREE.Color('grey'),
+            shininess: 50
+        });
+        
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        // Add atmosphere effect
+        const atmosphereGeometry = new THREE.SphereGeometry(2.1, 64, 64);
+        const atmosphereMaterial = new THREE.MeshPhongMaterial({
+            color: 0x6bc5f2,
+            transparent: true,
+            opacity: 0.2,
+            side: THREE.BackSide
+        });
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        scene.add(atmosphere);
+
+        // Enhanced lighting setup
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+        sunLight.position.set(5, 3, 5);
+        scene.add(sunLight);
+
+        camera.position.z = 5;
+
+        // Previous rotation controls and event handlers remain the same
+        let mouseDown = false;
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let currentRotationX = 0;
+        let currentRotationY = 0;
+
+        // Mouse and touch event handlers (same as before)
+        container.addEventListener('mousedown', (e) => {
+            mouseDown = true;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        container.addEventListener('touchstart', (e) => {
+            mouseDown = true;
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('mouseup', () => {
+            mouseDown = false;
+        });
+
+        document.addEventListener('touchend', () => {
+            mouseDown = false;
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (mouseDown) {
+                const deltaX = e.clientX - mouseX;
+                const deltaY = e.clientY - mouseY;
+                
+                targetRotationY += deltaX * 0.005;
+                targetRotationX += deltaY * 0.005;
+
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (mouseDown) {
+                const deltaX = e.touches[0].clientX - mouseX;
+                const deltaY = e.touches[0].clientY - mouseY;
+                
+                targetRotationY += deltaX * 0.005;
+                targetRotationX += deltaY * 0.005;
+
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Smooth rotation
+            currentRotationX += (targetRotationX - currentRotationX) * 0.05;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.05;
+            
+            // Apply rotations
+            globe.rotation.x = currentRotationX;
+            globe.rotation.y = currentRotationY;
+            atmosphere.rotation.x = currentRotationX;
+            atmosphere.rotation.y = currentRotationY;
+            
+            // Auto-rotation when not interacting
+            if (!mouseDown) {
+                targetRotationY += 0.002;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
